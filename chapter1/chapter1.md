@@ -111,3 +111,47 @@ Likewise, JavaScript engines like V8 are constantly evolving
 and improving JavaScript speed and efficiency using both time-tested and novel techniques.
 
 ## Some Limitations of JavaScript
+
+The case against JavaScript - in light of its evolution,
+ubiquity, and reach - is quite thin.
+You can say much about the language quirks and robustness failings,
+but the fact is that JavaScript is here to say,
+now and indefinitely.
+Regradless, it's worth acknowledging that JavaScrit is a flawed language.
+In fact, the most popular book on JavaScript,
+Doublas Crockford's _JavaScript: The Good Parts_ (O'Reilly),
+spends more pages discussing the terribel parts than the good.
+The language has true oddities, and by and large is not particularly succinct in expression.
+However, changing the problems with JavaScript would likely
+"break the Web",
+a circumstance that's unacceptable to most.
+It's because of these problems that the number of languages targeting JavaSciprt as a compilation platform is growing;
+indeed, this is a very fertile niche.
+
+As a language supporting - and at times preferring -
+imperative programming techniques and a reliance on global scoping,
+JavaScript is unsafe by default.
+That is, building programs with a key focus on mutability is potentially confusing
+as programs grow.
+Likewise, the very language itself provides the building blocks of many high-level features found by default in other languages.
+For example, JavaScript itself,
+prior to trunk versions of ECMAScript 6,
+provides no module system,
+but facilitates their creation using raw objects.
+That JavaScript provides a loose collection of basic parts ensures a bevy of custom module implementations,
+each incompatible with the next.
+Language oddities, unsafe features, and a sea of competing libraries:
+three legitimate reasons to think hard about the adoption of JavaScript.
+But there is a light at the end of the tunnel
+that's not just the light of an oncoming train.
+The light is that through discipline and an observance to certain conventions,
+JavaScript code can be not only safe,
+but also simple to understand and test,
+in addition to being proportionally scalable to the size of the code base.
+This book will lead you on the path to one such approach:
+functional programming.
+
+## Getting Started with Functional Programming
+
+You may have heard of functional programming on your favorite news aggregation site,
+or maybe you've worked in a language supporting functional techniques.
