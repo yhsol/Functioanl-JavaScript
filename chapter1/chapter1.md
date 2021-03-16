@@ -155,3 +155,125 @@ functional programming.
 
 You may have heard of functional programming on your favorite news aggregation site,
 or maybe you've worked in a language supporting functional techniques.
+If you've written JavaScript (and in this book I assume that you have)
+then you indeed _have_ used a language supporting funcional programming.
+However, htat being the case, you might not have used JavaScript in a functional way.
+This book outlines a functional style of programming that aims to simplify
+your own libraries and applications,
+and helps tame the wild beast of JavaScript complexity.
+As a bare-bones introduction,
+functional programming can be described in a single sentence:
+
+```
+  Functional programming is the use of functions that transform values into units of abstraction,
+  subsequently used to build software systems.
+```
+
+This is a simplification bordering on libel,
+but it's functional (ha!)
+for this early stage in the book.
+The library that I use as my medium of functional expression
+in JavaScript is Underscore,
+and for the most part,
+it adheres to this basic definition.
+However, this definition fails to explain the "why" of functional programming.
+
+## Why Functional Programming Matters
+
+```
+  The major evolution that is still going on for me is towards a more functional programming style,
+  which involves unlearning a lot of old habits,
+  and backing away from some OOP directions.
+  - John Carmack
+```
+
+If you're familiar with object-oriented programming,
+then you may agree that its primary goal is to break a problem into parts,
+as shown in Figure 1-1 (Gamma 1995).
+
+```
+image
+Figure 1-1. a problem broken into object-oriented parts
+```
+
+Likewise, these parts/objects can be aggregated and composed to form larger parts,
+as shown in Figure 1-2.
+
+```
+image
+Figure 1-2. Objects are "composed" together to from bigger objects
+```
+
+Based on these parts and their aggregates,
+a system is then described in terms of the interactions and values of the parts,
+as shown in Figure 1-3.
+
+```
+image
+Figure 1-3. An object-oriented system and its interactions as a sequence diagram
+```
+
+This is a gross simplification of how object-oriented systems are formed,
+but I think that as a high-level description it works just fine.
+
+By comparison, a strict functional programming approach to solving problems also breaks a problem into parts (namely, functions), as shown in Figure 1-4.
+
+```
+image
+Figure 1-4. A problem broken into functional parts
+```
+
+Whereas the object-oriented approach tends to break problems into grouping of "nouns," or objects, a functional approach breaks the same problem into groupings of "verbs," or functions.
+As with object-oriented programming,
+larger functions are formed by "gluing" or "composing" other functions together to build high-level behaviors,
+as shown in Figure 1-5.
+
+```
+image
+Figure 1-5. Functions are also componsed together to from more behaviors
+```
+
+Finally, one way that the functional parts are fomed into a system
+(as shown in Figure 1-6) is by taking a value and gradually "transforming" it
+
+- via one primitive or composed function - into another.
+
+```
+image
+Figure 1-6. A functional system interacts via data transfomation
+```
+
+In a system observing a strict object-oriented style,
+the interactions between objects cause internal change to each object,
+leading to an overall system state that is the amalgamation of many smaller,
+potentially subtle state changes.
+These interrelated state changes form a conceptual "web of change"
+that, at times, can be confusing to keep in your head.
+This confusion becomes a problem when the act of adding new objects and
+system features requires a working knowledge of the subtleties of potentially farreaching state changes.
+
+A functional system,
+on the other hand,
+strives to minimize observable state modification.
+Therefore, adding new features to a system
+built using functional principles is a matter of understanding
+how new functions can operate within the context of localized,
+nondestructive (i.e., original data is never changed)
+data transformations.
+However, I hesitate to create a false dichotomy and say that functional and object-oriented styles should stand in opposition.
+That JavaScript supports both models means that systems can and should be
+composed of both models.
+Finding the balance between functional and object-oriented styles is a tricky task that will be tackled much later in the book,
+when discussing mixins in Chapter 9.
+However, since this is a book about functional programming in JavaScript,
+the bulk of the discussion is focused on functional styles rather than object-oriented ones.
+
+Having said that,
+a nice image of a system built along functional principles is an
+assemply-line device that takes raw materials in one end,
+and gradually builds a product that comes out the other end (Figure 1-7).
+
+```
+image
+Figure 1-7. A functional program is a machine for transforming data
+```
