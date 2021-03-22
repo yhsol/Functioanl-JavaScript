@@ -277,3 +277,439 @@ and gradually builds a product that comes out the other end (Figure 1-7).
 image
 Figure 1-7. A functional program is a machine for transforming data
 ```
+
+The assembly line analogy is,
+of course, not entirely perfect,
+because every machine I know consumes its raw materials to produce a product.
+By contrast,
+functional programming is what happens when you take a system built in an imperative way and shrink explicit state changes to the smalles possible footprint to make it more modular (Hughes 1984).
+Practival functional programming is not about eliminating state change,
+but instead about reducing the occurrences of mutation to the smallest area possible for any given system.
+
+## Functions as Units of Abstraction
+
+One method of abstraction is that functions hide implementation details from view.
+In fact, functions are a beautiful unit of work allowing you to adhere to the long-practiced maxim in the UNIX community,
+set forth by Butler Lampson:
+
+`Make it run, make it right, make it fast.`
+
+Likewise, functions-as-abstraction allow you to fulfill Kent Beck's similarly phrased mantra of test-driven development (TDD):
+
+`Make it run, then make it right, the make it fast.`
+
+For example, in the case of reporting errors and warnings,
+you could write something like the following:
+
+```js
+function parseAge(age) {
+  if (!_.isString(age)) throw new Error("Expecting a string");
+  var a;
+
+  console.log("Attempting to parse an age");
+
+  a = parseInt(age, 10);
+
+  if (!_isNaN(a)) {
+    console.log(["Could not parse age: ", age].join(" "));
+    a = 0;
+  }
+
+  return a;
+}
+```
+
+This function, although not comprehensive for parsing age strings,
+is nicely illustrative.
+Use of `parseAge` is as follows:
+
+```js
+parseAge("42");
+// (console) Attempting to parse an age
+// => 42
+
+parseAge(42);
+// Error: Expecting a string
+
+parseAge("frab");
+// (console) Attempting to parse an age
+// (console) Could not parse age: frab
+// => 0
+```
+
+The `parseAge` function works as written,
+but if you want to modify the way that errors,
+information, and warnings are presented,
+then changes need to be made to the appropriate lines therein,
+and anywhere else similar patterns are used.
+A better approach is to "abstract" the notion of errors,
+information, and warnings info functions:
+
+```js
+function fail(thing) {
+  throw new Error(thing);
+}
+
+function warn(thing) {
+  console.log(["WARNING: ", thing].join(" "));
+}
+
+function note(thing) {
+  console.log(["NOTE: ", thing].join(" "));
+}
+```
+
+Using these functions, the `parseAge` function can be rewritten as follows:
+
+```js
+function parseAge(age) {
+  if (!_.isString(age)) fail("Expecting a string");
+  var a;
+
+  note("Attempting to parse an age");
+  a = parseInt(age, 10);
+
+  if (_.isNaN(a)) {
+    warn(["Could not parse age: ", age].join(" "));
+    a = 0;
+  }
+
+  return a;
+}
+```
+
+Here's the new behavior:
+
+```js
+parseAge("frob");
+// (console) NOTE: Attempting to parse an age
+// (console) WARNING: Could not parse age: frob
+// => 0
+```
+
+It's not very different from the old behavior,
+except that now the idea of reporting errors,
+information, and warnings has been abstracted away.
+The reporting or errors,
+information, and warings can thus be modified entirely:
+
+```js
+function note() {}
+function warn(str) {
+  alert("That doesn't look like a valid age");
+}
+
+parseAge("frob");
+// (alert box) That doesn't look like a valid age
+// => 0
+```
+
+Therefore, because the behavior is contained within a single function,
+the function can be replaced by new functions providing similar behavior or outright different behaviors altogether (Abelson and Sussman 1996).
+
+## Encapsulation and Hiding
+
+Over the years,
+we've been taught that a conrnerstone of object-oriented programming in _encapsulation_.
+The term encapsulation in reference to object-oriented programming refers to a way of
+packaging certain peices of data with the very operations that manipulate them,
+as seen in Figure 1-8.
+
+```
+image
+Figure 1-8. Most object-oriented languages use object boundaries
+to package data elements
+with the operations that work on them;
+a Stack class would therefore package an array of elements with the push,
+pop, and peek opeartions used to manipulate it
+```
+
+JavaScript provides an object system
+that does indeed allow you to encapsulate data
+with its manipulators.
+However,
+sometimes encapsulation is used to restrict
+the visibility of certain elements,
+and this act is known as _data hiding_.
+JavaScript's object system
+does not provide a way to hide data directly,
+so data is hidden using something called closures,
+as shown in Figure 1-9.
+
+```
+image
+Figure 1-9. Using a closure to encapsulate data is a functional way to hide details from a client's view
+```
+
+Closures are not covered in any depth until Chapter 3,
+but for now you should keep in mind that clousures
+are kinds of functions.
+By using functional techniques
+involving closuers,
+you can achieve data hiding that is as effective as the same capability
+offered by most object-oriented languages,
+though I hesitate to say whether functional encapsulation or object-oriented encpasulation is better.
+Instead, while they are different in practice,
+they both provide similar ways of building
+certain kinds of abstraction.
+In fact,
+this book is not at all about encourating you to
+throw away everything that you might have ever leanred in favor of functional programmin;
+instead, it's meant to explain functional programming on its own terms so that you can decide if it's right for your needs.
+
+## Functions as Units of Behavior
+
+Hiding data and behavior (which has the side effect of providing a more agile change experience) is just one way that functions can be units of abstraction.
+Another is to provide an easy way to store and pass around discrete units of basic behavior.
+Take, for example,
+JavaScript's syntax to denote looking up a value in an array by index:
+
+```js
+var letters = ["a", "b", "c"];
+
+letters[1];
+//=> 'b'
+```
+
+While array indexing is a core behavior of JavaScript,
+there is no way to grab hold of the
+behavior and use it as needed without placing it into a function.
+Therefore, a simple example of a function that abstracts array indexing behavior
+could be called be `nth`.
+The naive implementation of `nth` is as follows:
+
+```js
+function naiveNth(a, index) {
+  return a[index];
+}
+```
+
+As you might suspect,
+`nth` operates along the happy path perfectly fine:
+
+```js
+naiveNth(letters, 1);
+//=> "b"
+```
+
+However, the function will fail if given something unexpected:
+
+```js
+naiveNth({}, 1);
+//=> undefined
+```
+
+Therefore, if I were to think about the abstraction surrounding a function `nth`,
+I might devise the following statement:
+_nth returns located at a valid index within a data type allowing indexed access._
+A key part of this statement is the idea of an indexed data type.
+To determine if something is an indexed data type,
+I can create a function `isIndexed`, implemented as follows:
+
+```js
+function isIndexed(data) {
+  return _.isArray(data) || _.isString(data);
+}
+```
+
+The function `isIndexed` is also a function providing an abstraction
+over checking if a piece of data is a string or an array.
+Building abstraction on abstraction leads to the following complete implementation of `nth`:
+
+```js
+function nth(a, index) {
+  if (!_.isNumber(index)) fail("Expected a number as the index");
+  if (!isIndexed(a)) fail("Not supported on not-indexed type");
+  if (index < 0 || index > a.length - 1) fail("Index value is out of bounds");
+
+  return a[index];
+}
+```
+
+The completed implementation of `nth` operates as follows:
+
+```js
+nth(letters, 1);
+//=> 'b'
+
+nth("abc", 0);
+//=> "a"
+
+nth({}, 2);
+// Error: Not supported on non-indexed type
+
+nth(letters, 4000);
+// Error: Index value is out of bounds
+
+nth(letters, "aaaaa");
+// Error: Expected a number as the index
+```
+
+In the same way that I built the `nth` abstraction out of an `indexed` abstraction,
+I can likewise build a `second` abstraction:
+
+```js
+function second(a) {
+  return nth(a, 1);
+}
+```
+
+The `second` function allows me to appropriate the correct behavior of `nth` for a different but related use case:
+
+```js
+second(["a", "b"]);
+//=> "b"
+
+second("fogus");
+//=> "o"
+
+second({});
+// Error: Not supported on non-indexed type
+```
+
+Another unit of basic behavior in JavaScript is the idea of a comparator.
+A comparator is a function that takes two values and returns `<1` if the first is `less` than the second,
+`>1` if it is `greater`, and `0` if they are equal.
+In fact,
+JavaScript itself can appear to use the very nature of numbers themselves to provide a default `sort` method:
+
+```js
+[2, 3, -6, 0, -108, 42].sort();
+//=> [-108, -6, 0, 2, 3, 42]
+```
+
+But a problem arises when you have a different mix of numbers:
+
+```js
+[0, -1, -2].sort();
+//=>[-1, -2, 0]
+
+[2, 3, -1, -6, 0, -108, 42, 10].sort();
+//=> [-1, -108, -6, 0, 10, 2, 3, 42]
+```
+
+The problem is that when given no arguments,
+The `Array#sort` method does a string comparison.
+However, every JavaScript programmer knows that `Array#sort` expects a comparator,
+and instead writes:
+
+```js
+[2, 3, -1, -6, 0, -108, 42, 10].sort(function (x, y) {
+  if (x < y) return -1;
+  if (y < x) return 1;
+  return 0;
+});
+
+//=> [-108, -6, -1, 0, 2, 3, 10, 42]
+```
+
+That seems better, but there is a way to make it more generic.
+After all, you might need to sort like this again in another part of the code,
+so perhaps it's better to pull out the anonymous function and give it a name:
+
+```js
+function compareLessThanOrEqual(x, y) {
+  if (x < y) return -1;
+  if (y < x) return 1;
+  return 0;
+}
+
+[2, 3, -1, -6, 0, -108, 42, 10].sort(compareLessThanOrEqual);
+//=> [-108, -6, -1, 0, 2, 3, 10, 42]
+```
+
+But the problem with the `compareLessThanOrEqual` function is that it is coupled to the idea of "comparatorness" and cannot easily stand on its own as a generic comparison operation:
+
+```js
+if (compareLessThanOrEqual(1, 1)) console.log("less or equal");
+
+// nothing prints
+```
+
+To achieve the desired effects,
+I would need to _know_ about `compareLessThanOrEqual`'s comparator nature:
+
+```js
+if (_.contains([0, -1], compareLessThanOrEqual(1, 1)))
+  console.log("less or equal");
+
+// less or equal
+```
+
+But this is less than satisfying,
+especially when there is a possibility for some developer
+to come along in the future and change the return value of `compareLessThanOrEqual`
+to `-42` for negative comparisons.
+A better way to write `compareLessThanOrEqual` might be as follows:
+
+```js
+function lessOrEqual(x, y) {
+  return x <= y;
+}
+```
+
+Functions that always return a Boolean value (i.e., `true` or `false` only),
+are called _predicates_. So, instead of an elaborate comparator construction,
+`lessOrEqual` is simply a "skin" over the built-in `<=` operator:
+
+```js
+[2, 3, -1, -6, 0, -108, 42, 10].sort(lessOrEqual);
+//=> [100, 10, 1, 0, -1, -1, -2]
+```
+
+At this point,
+you mgiht be inclined to change careers.
+However, upon further reflection,
+the result makes sense. If `sort` expects a comparator, and `lessThan` only returns `true` or `false`, then you need to somehow get from the would of the latter to that of the former without duplicating a bunch of `if/then/else` boilerplate.
+The solution lies in creating a function, `comparator`, that takes a predicate and converts its result the `-1/0/1` result
+expected of `comparator` functions:
+
+```js
+function comparator(pred) {
+  return function (x, y) {
+    if (truthy(pred(x, y))) return -1;
+    else if (truthy(pred(y, x))) return 1;
+    else return 0;
+  };
+}
+```
+
+Now, the `comparator` function can be used to return a new function
+that "maps" the results of the predicate `lessOrEqual` (i.e., `true` or `false`)
+onto the results expected of comparators (i.e., `-1`, `0`, or `1`),
+as shown in Figure 1-10.
+
+```
+image
+Figure 1-10. Bridging the gap between two "worlds" using the comparator function
+```
+
+In functional programming,
+you'll almost always see functions interacting in a way that allows
+one type of data to be brought into the world of another type of data.
+Observe `comparator` in action:
+
+```js
+[100, 1, 0, -1, -2, -1].sort(compartor(lessOrEqual));
+//=> [-2, -1, -1, 0, 1, 10, 100]
+```
+
+The function `comparator` will work to map any function that returns
+"truthy" or "falsey" values
+onto the notion of "comparatorness".
+This topic is covered in much greater depts in Chapter 4.
+but it's worth noting now that `comparator` is a _higher-order function_
+(because it takes a function and returns a new function).
+Keep in mind that not every predicate makes sense for use with the
+`comparator` function, however.
+For example, what does it mean to use the `_.isEqual` function as the basis for a `comparator`?
+Try it out and see what happens.
+
+Throughout this book,
+I will talk about the ways that functional techniques
+provied and facilitate the creation of abstractions,
+and as I'll discuss ensxt,
+there is a beautiful synerge betwee
+functions-an-abstraction and data.
+
+## Data as Abstarction

@@ -43,3 +43,21 @@ let joinElements = unsplat(function (array: any) {
 console.log(joinElements(1, 2));
 
 console.log(joinElements("-", "$", "/", "!", ":"));
+
+function parseAge(age: any) {
+  if (!_.isString(age)) throw new Error("Expecting a string");
+  var a;
+
+  console.log("Attempting to parse an age");
+
+  a = parseInt(age, 10);
+
+  if (_.isNaN(a)) {
+    console.log(["Could not parse age: ", age].join(" "));
+    a = 0;
+  }
+}
+
+console.log('parseAge("42"): ', parseAge("42"));
+console.log("parseAge(42): ", parseAge(42));
+console.log('parseAge("frob"): ', parseAge("frob"));
