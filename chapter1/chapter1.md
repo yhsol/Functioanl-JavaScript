@@ -713,3 +713,19 @@ there is a beautiful synerge betwee
 functions-an-abstraction and data.
 
 ## Data as Abstarction
+
+JavaScript's object prototype model is a rich and foundational data scheme.
+On its own, the prototype model provides a level of flexibility not found in many other mainstream programming languages.
+However, many JavaScript programmers, as is their wont,
+immediately sttempts to build a class-based object system using the prototype or closure features (or both).
+Although a class system has its strong points,
+very often the data needs of a JavaScript application are much simpler than is served by classes.
+
+Instead, using JavaScript bare data primitives,
+objects, and arrays, much of the data modeling tasks that are currently served by classes are subsumed.
+Historically, functional programming has centered around building building functions that work to achieve higher-level behaviors ans work on very simple data constructs.
+
+In the case of this book (and Underscore itself),
+the focus is indeed on processing arrays and objects.
+The flexibility in those two simple data types is astounding,
+and it's unfortunate that they are often overlooked in favor of yet another class-based system.
