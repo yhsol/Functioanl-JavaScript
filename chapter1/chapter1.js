@@ -3,7 +3,12 @@ const _ = require("lodash");
 function run() {
   // if (_.includes([0, -1], compareLessThanOrEqual(1, 1)))
   //   console.log("less or equal");
-  sorteds();
+  // sorteds();
+  const csv = `name, age, hair
+  Merble, 35, red
+  Bob, 64, blonde`;
+  const result = lameCSV(csv);
+  console.log("result: ", result);
 }
 run();
 
@@ -127,3 +132,33 @@ function comparator(pred) {
     else return 0;
   };
 }
+
+function lameCSV(str) {
+  return _.reduce(
+    str.split("\n"),
+    function (table, row) {
+      table.push(
+        _.map(row.split(","), function (c) {
+          return c.trim();
+        })
+      );
+      return table;
+    },
+    []
+  );
+}
+
+const lameCSVArrow = (str) => {
+  return _.reduce(
+    str.split("n"),
+    (table, row) => {
+      table.push(
+        _.map(row.split(","), (c) => {
+          return c.trim();
+        })
+      );
+      return table;
+    },
+    []
+  );
+};

@@ -729,3 +729,138 @@ In the case of this book (and Underscore itself),
 the focus is indeed on processing arrays and objects.
 The flexibility in those two simple data types is astounding,
 and it's unfortunate that they are often overlooked in favor of yet another class-based system.
+
+Imagine that you're tasked with writing a JavaScript application that deals with comma separated value (CSV) files,
+which are a standard way to represent data tables.
+For example, suppose you have a CSV file that looks as follows:
+
+```
+name,    age,     hair
+Merble,  35,      red
+Bob,     64,      blonde
+```
+
+It should be clear that this data represents a table with three columns (name, age, and hair) and three rows (the first being the header row, and the res being the data rows).
+A small function to parse this very constrained CSV representation stored in a string is implemented as follows:
+
+```js
+function lameCSV(str) {
+  return _.reduce(
+    str.split("\n"),
+    function (table, row) {
+      table.push(
+        _.map(row.split(","), function (c) {
+          return c.trim();
+        })
+      );
+      return table;
+    },
+    []
+  );
+}
+```
+
+You'll notice that the function `lameCSV` processes the rows one by one,
+splitting at `\n` and then stripping whitespace for each cell therein.
+The whole data table is an array of sub-arrays,
+each containing strings.
+From the conceptual views shown in Table 1-1,
+nested arrays can be viewed as a table.
+
+_Table 1-1. Simply nested arrays are one way to abstract a data table_
+|name|age|hair|
+|Merble|35|64|
+|Bob|64|blonde|
+
+Using `lameCSV` to parse the data stored in a string works as follows:
+
+```js
+var peopleTable = lameCSV("name,age,hair\nMerble,35,red\nBob,64,blonde");
+
+peopleTable;
+//=> [["name", "age", "hair"],
+//    ["Merble", "35", "red"],
+//    ["Bob", "64", "blonde"]]
+```
+
+Using selective spacing highlights the table nature of the returned array.
+In functional programming,
+functions like `lameCSV` and the previously defined `comparator` are key in translating one datat type into another.
+Figure 1-11 illustrates how data transformations in general can be viewed as getting from one "world" into another.
+
+```
+images
+Figure 1-11. Functions can bridge the gap between two "worlds"
+```
+
+There are better ways to represent a table of such data,
+but this nested arrays serves us well for now.
+Indeed, there is littel motivation to build a complex class hierarchy representing either the table itself,
+the rows, people, or whatever.
+Instead, keeping the data representation minimal allows me to use existing array fields and array processing functions and methods out of the box.
+
+```js
+_.rest(peopleTable).sort();
+
+//=> [["Bob", "64", "blonde"],
+//    ["Merble", "35", "red"]]
+```
+
+Likewise, since I know the form of the original data,
+I can create appropriately named selector functions to access the data in a more descriptive way:
+
+```js
+function selectNames(table) {
+  return _.rest(_.map(table, _.first));
+}
+
+function selectAges(table) {
+  return _.rest(_.map(table, second));
+}
+
+function selectHairColor(table) {
+  return _.rest(
+    _.map(table, function (row) {
+      return nth(row, 2);
+    })
+  );
+}
+
+var mergeResults = _.zip;
+```
+
+The `select` functions defined here use existing array processing functions to provide fluent access to simple data types:
+
+```js
+selectNames(peopleTable);
+//=> ["Merble", "Bob"]
+
+selectAges(peopleTable);
+//=> ["35", "64"]
+
+selectHairColor(peopleTable);
+//=> ["red", "blonde"]
+
+mergeResults(selectNames(peopleTable), selectAge(peopleTable));
+//=> [["Merble", "35"], ["Bob", "64"]]
+```
+
+The simplicity of implementation and use is a compelling argument for using JavaScript's core data structures for data modeling purposes.
+That's not to say that there is no place for an object-oriented or class-based approach.
+In my experience,
+I've found that a functional approach centered around generic collection processing functions is ideal for handling data about people and an object-oriented approach works best for simulating people.
+
+If you are so inclined,
+the data table could be changed to a custom class-based model,
+and as long as you use the selector abstractions,
+then the user would never know,
+nor care.
+However, throughout this book,
+I strive to keep the data needs as simple as possible and build abstract functions
+that operate on them.
+Constraining myself to functions operating on simple data,
+interestingly enough,
+increases my flexibility.
+You might be surprised how far these funcdamental types will take you.
+
+## A Taste of Function JavaScript
