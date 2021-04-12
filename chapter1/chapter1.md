@@ -864,3 +864,267 @@ increases my flexibility.
 You might be surprised how far these funcdamental types will take you.
 
 ## A Taste of Function JavaScript
+
+This is not a booke about navigating around the quirks of JavaScript.
+There are many other books that will help you along that path.
+However, before I start any JavaScript project these days,
+I define two useful functions that I often find a need for: `existy` and `truthy`.
+
+The function `existy` is meant to define the existence of something.
+JavaScript has two values-`null` and `undefined`- that signify nonexistence.
+Thus, `existy` checks that its argument is neither of these things, and is implemented as follows:
+
+```js
+function existy(x) {
+  return x != null;
+}
+```
+
+Using the loose inequality operator (!=),
+it is possible to distinguish between `null`,
+`undefined`, and everything else.
+It's used as follows:
+
+```js
+existy(null);
+//=> false
+
+existy(undefined);
+//=> false
+
+existy({}.notHere);
+//=> false
+
+existy((function () {})());
+//=> false
+
+existy(0);
+//=> true
+
+existy(false);
+//=> true
+```
+
+The use of `existy` simplifies what it means for something to exist in JavaScript.
+Minimally, it collocates the existence check in an easy-to-use function.
+The second function mentioned, `truthy`, is defined as follows:
+
+```js
+function truthy(x) {
+  return x != false && existy(x);
+}
+```
+
+The `truthy` function is used to determine if something should be considered a synonym for `true`, and is used as shown here.
+
+```js
+truthy(false);
+//=> false
+
+truthy(undefined);
+//=> false
+
+truthy(0);
+//=> true
+
+truthy("");
+//=> true
+```
+
+In JavaScript, it's sometimes useful to perform some action only if a condition is true and return something like `undefined` or `null` otherwise. The general pattern is as follows:
+
+```js
+{
+  if (condition) return _.isFunction(doSomething) ? doSomething() : doSomething;
+  else return undefined;
+}
+```
+
+Using `truthy`, I can encapsulate this logic in the following way:
+
+```js
+function doWhen(cond, action) {
+  if (truthy(cond)) return action();
+  else return undefined;
+}
+```
+
+Now whenever that pattern rears its ugly head,
+you can do the following instead:
+
+```js
+function executeIfHasField(target, name) {
+  return doWhen(existy(target[name]), function () {
+    var result = _.result(target, name);
+    console.log(["The result is", result].join(" "));
+    return result;
+  });
+}
+```
+
+The execution of `executeIfHasField` for success and error cases is as follows:
+
+```js
+executeIfHasField([1, 2, 3], "reverse");
+// (console) The result is 3, 2, 1
+//=> [3, 2, 1]
+
+executeIfHasField({ foo: 42 }, "foo");
+// (console) The result is 42
+
+//=> 42
+
+executeIfHasField([1, 2, 3], "notHere");
+//=> undefined
+```
+
+Big deal, right? So I've defined two functions - this is hardly functional programming.
+The functional part comes from their use.
+You may be familiar with the `Array#map` method available in many JavaScript implementaions.
+It's meant to take a function and call it for every element in an array,
+returning a new array with the new values.
+It's used as follows:
+
+```js
+[null, undefined, 1, 2, false].map(existy);
+//=> [false, false, true, true, true]
+
+[null, undefined, 1, 2, false].map(truthy);
+//=> [false, false, true, true, false]
+```
+
+This, ladies and gentlemen, is functional programming:
+
+- The definition of an abstraction for "existence" in the guise of a function
+- The definition of an abstraction for "truthiness" built from existing functions
+- The use of said functions by other functions via parameter passing to achieve some behavior
+
+This book is all about code like this,
+but to an exquisite level of detail.
+
+## On Speed
+
+I know what you're thinking.
+This functional programming stuff has to be slow as a dog, right?
+There's no way to deny that the use of the array index form
+`array[0]` will execute faster that either of `nth(array, 0)` or `_.first(array)`.
+Likewise, an imperative loop of the following form will be very fase:
+
+```js
+for (var i = 0, len = array.length; i < len; i++) {
+  doSomething(array[i]);
+}
+```
+
+An analogous use of Underscore's `_.each` function will, all factors being equal, be slower:
+
+```js
+_.each(array, function (elem) {
+  doSomething(array[i]);
+});
+```
+
+However, it's very likely that all factors will not be equal.
+Certainly, if you had a function that needed speed,
+then a reasonable manual transformation would be to convert the internal use of
+`_.each` into an analogous use of `for` or `while`.
+Happily, the days of the ponderously slow JavaScript are coming to an end,
+and in some cases are a thing of the past.
+For example, the release of Google's V8 engine ushered in an age of runtime
+optimizations that have worked to motivate performance gains across all JavaScript engine vendors (Bak 2021).
+Even if other vendors were not following Google's lead,
+the prevalence of the V8 engine is growing,
+and in fact drives the very popular Chrome browser and Node.js itself.
+However, other vendors are follwoing the V8 lead and introducing runtime speed enhancements such as native-code execution,
+just-in-time compilation,
+faster garbage collection.
+call-size caching, and in-lining into their own JavaScript engines.
+However, the need to support aging browsers like Internet Explore 6 is a very real requirement for some JavaScript programmers.
+There are two factors to consider when confronted with legacy platforms:
+(1) the use of IE6 and its ilk is dying out, and (2) htere are other ways to gain speed before the code ever hits the browser.
+For example, the subject of in-lining is particularly interesting,
+because many in-lining optimizations can be performed _statically_,
+or before code is ever run.
+Code in-lining is the act of taking a piece of code contained in, say,
+a funciton, and "pasting" it in place of a call to that very function.
+Let's take a look at an example to make things clearer.
+Somewhere in the depths of Underscore's `_.each` implementation is a loop very similary to the `for` loop shown earlier (edited for clarity):
+
+```js
+_.each = function (obj, iterator, context) {
+  // bounds checking
+  // check for native method
+  // check for length property
+  for (var i = 0, l = obj.length; i < l; i++) {
+    // call the given function
+  }
+};
+```
+
+Imagine that you have a bit of code that looks as follwos:
+
+```js
+function performTask(array) {
+  _.each(array, function (elem) {
+    doSomething(array[i]);
+  });
+}
+
+// ... some time later
+
+performTask([1, 2, 3, 4, 5]);
+```
+
+A static optimizer could transform the body of `perform` Task into the following:
+
+```js
+function performTask(array) {
+  for (var i = 0, l = array.length; i < l, i++) {
+    doSomething(array[i]);
+  }
+}
+```
+
+And a sophisticated optimization tool could optimize this further by eliminating the function call altogether:
+
+```js
+// ... some time later
+
+var array123 = [1, 2, 3, 4, 5];
+
+for (var i = 0, l = array123.length; i < l; i++) {
+  doSomething(array[i]);
+}
+```
+
+Finally, a really amazing static analyzer could optimize it enve further into five separate calls:
+
+```js
+// ... some time later
+
+doSomething(array[1]);
+doSomething(array[2]);
+doSomething(array[3]);
+doSomething(array[4]);
+doSomething(array[5]);
+```
+
+And to top of this amazing set of optimizing transformations,
+you can imagine that if these calls have no effects or are never called,
+then the optimal transformation is:
+
+```js
+// ... some time later
+```
+
+That is, if a piece of code can be determined to be "dead" (i.e., not called),
+then it can safely be eliminated via a process known as _code elision_.
+There are already program optimizers available for JavaScript that perform these types of coptimizations - the primary being Google's Closure compiler.
+The Closure compiler is an amazing piece of engineering that compiles JavaScript into highly optimized JavaScript.
+There are many different ways to speed up even highly functional code bases using a combination of best practices and optimization tools.
+However, very often we're too quick to consider matters of raw computation speed before we've enve written a stitch of correct code.
+Likewise, I sometimes find my mind drifting towrad speed considerations even if raw speed is not needed for the types of systems that I create.
+Underscroe is a very popular functional programming library for JavaScript,
+and a great many applications do just fine with it.
+The same can be said for heavyweight champion of JavaScritp libraries,
+jQuery, which fosters many functional idioms.
