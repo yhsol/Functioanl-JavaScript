@@ -1128,3 +1128,59 @@ Underscroe is a very popular functional programming library for JavaScript,
 and a great many applications do just fine with it.
 The same can be said for heavyweight champion of JavaScritp libraries,
 jQuery, which fosters many functional idioms.
+
+Certainly there are legitimate domains for raw speed (e.g., game programming and lowlatency systems). However, even in the face of such systems’ execution demands, func‐
+tional techniques are not guaranteed to slow things down. You would not want to use
+a function like nth in the heart of a tight rendering loop, but functional structuring in
+the aggregate can still yield benefits.
+The first rule of my personal programming style has always been the following: Write
+beautiful code. I’ve achieved this goal to varying degrees of success throughout my
+career, but it’s always something that I strive for. Writing beautiful code allows me to
+optimize another aspect of computer time: the time that I spend sitting at a desk typing
+on a keyboard. I find a functional style of writing code to be exceptionally beautiful if
+done well, and I hope that you’ll agree by the time you reach the end.
+
+### The Case for Underscore
+
+Before moving on to the meat of the book, I’d like to explain why I chose Underscore
+as my mode of expression. First of all, Underscore is a very nice library that offers an
+API that is pragmatic and nicely functional in style. It would be fruitless for me to
+implement, from scratch, all of the functions useful for understanding functional pro‐
+gramming. Why implement map when the idea of “mappiness” is more important? That’s
+not to say that I will not implement core functional tools in this book, but I do so with
+Underscore as a foundation.19
+Second, there is a greater than zero chance that running the preceding code snippets
+using Array#map did not work. The likely reason is that in whichever environment you
+chose to run it might not have had the map method on its array implementation. What
+I would like to avoid, at any cost, is getting bogged down in cross-browser incompati‐
+bility issues. This noise, while extremely important, is a distraction to the larger purpose
+of introducing functional programming. The use of Underscore eliminates that noise
+almost completely!20
+24 | Chapter 1: Introducing Functional JavaScript
+www.it-ebooks.info 21. This a facet of the nature of programming in my opinion. 22. I’m particularly enamored with the microjs website for discovering JavaScript libraries.
+Finally, JavaScript by its very nature enables programmers to reinvent the wheel quite
+often. JavaScript itself has the perfect mix of powerful low-level constructs coupled with
+the absence of mid- and high-level language features. It’s this odd condition that almost
+dares people to create language features from the lower-level parts. Language evolution
+will obviate the need to reinvent some of the existing wheels (e.g., module systems), but
+we’re unlikely to see a complete elimination of the desire or need to build language
+features.21 However, I believe that when available, existing high-quality libraries should
+be reused.22 It would be fun to re-implement Underscore’s capabilities from scratch, but
+it would serve neither myself (or my employer) nor you to do so.
+
+### Summary
+
+This chapter covered a few introductory topics, starting with the motivation for learning
+and using JavaScript. Among the current stable of popular programming languages, few
+seem more poised for growth than JavaScript. Likewise, the growth potential seems
+almost limitless. However, JavaScript is a flawed language that needs to call on powerful
+techniques, discipline, or a mixture of both to be used effectively. One technique for
+building JavaScript applications is called “functional programming,” which in a nutshell,
+consists of the following techniques:
+• Identifying an abstraction and building a function for it
+• Using existing functions to build more complex abstractions
+• Passing existing functions to other functions to build even more complex
+abstractions
+However, functions are not enough. In fact, functional programming very often works
+best when implemented in concert with powerful data abstractions. There is a beautiful
+symmetry between functional
