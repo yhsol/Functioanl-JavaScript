@@ -95,13 +95,17 @@ function Point3D(x, y, z) {
 const createdPoint3D = new Point3D(10, -1, 100);
 const createdPoint2D2 = new Point2D(0, 1);
 
-console.log(createdPoint2D);
-console.log(createdPoint3D);
-console.log(createdPoint2D2);
+function collectionCentricProgramming() {
+  // return _.map({ a: 1, b: 2 }, _.identity); // retun values
+  return _.map({ a: 1, b: 2 }, function (v, k, coll) {
+    return [k, v, _.keys(coll)];
+  });
+}
 
 function run() {
   // eachFn(["whiskey", "tango", "foxtrot"]);
   // song2(99, 0, lyricsSegment);
-  prototype();
+  // prototype();
+  console.log(collectionCentricProgramming());
 }
 run();

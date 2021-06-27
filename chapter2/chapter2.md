@@ -403,3 +403,23 @@ functional programming as you can get, but Underscore provides numerous others f
 your use. Before I get into those, let me take a moment to cover the idea of collectioncentric programming, which is often coupled with functional programming itself.
 
 ### Collection-Centric Programming
+
+Functional programming is extremely useful for tasks requiring that some operation happen on many items in a collection.
+
+### Other Examples of Applicative Programming
+
+##### reduceRight
+
+You've already seen the `_.reduce` function, but I failed to mention its sibling `_.reduceRight`. The two function operate in much the same way, except that `_reduce` works from left to right, wheares `_.reduceRight` works from right to left. Observe the differences:
+
+```js
+var nums = [100, 2, 25];
+
+function div(x, y) {return x/y}
+
+_.reduce(nums, div)
+//=> 2
+
+_.reduceRight(nums, div):
+//=> 0.125
+```
