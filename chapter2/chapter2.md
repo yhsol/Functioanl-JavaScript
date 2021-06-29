@@ -423,3 +423,76 @@ _.reduce(nums, div)
 _.reduceRight(nums, div):
 //=> 0.125
 ```
+
+The work of `_.reduce` is similar to `(100/2) / 25 whlie _.reduceRight is (25/2) / 100`.
+If the function supplied to the reduce siblings is assocative, then they wind up returning the same values, but ohterwise the difference in ordering can prove useful.
+Many common functions can be created using `_.reduceRight`.
+Here are a couple more examples:
+
+```js
+function allOf(/* funs */) {
+  return _.reduceRight(
+    arguments,
+    function (truth, f) {
+      return truth && f();
+    },
+    true
+  );
+}
+
+function anyOf(/* funs */) {
+  return _.reduceRight(
+    arguments,
+    function (truth, f) {
+      return truth || f();
+    },
+    false
+  );
+}
+```
+
+Example usage of `allOf` and `anyOf` are as follows:
+
+```js
+function T() {
+  return true;
+}
+function F() {
+  return false;
+}
+
+allOf();
+//=> true
+allOf(T, T);
+//=> true
+allOf(T, T, T, T, F);
+//=> false
+anyOf(T, T, F);
+//=> true
+anyOf(F, F, F, F);
+//=> false
+anyOf();
+//=> false
+```
+
+The `_.reduceRight` function has further advantages in languages providing lazy evaluation, but since JavaScript is not a language, evaluation `order` is key factor (Bird 1988).
+
+##### find
+
+The `find` function is fairly straightforward;
+it takes a collection and a predicate and returns the first element for
+which the predicate returns `true`.
+An example of `find` is as follows:
+
+```js
+_.find(["a", "b", 3, "d"], _.isNumber);
+//=> 3
+```
+
+Notice the use of the built-in function `_.isNumber` as the predicate function.
+Underscore comes with numerous predicates ready for use,
+including `_.isEqual`, `_.isEmpty`,
+`_.isElement`, `_.isArray`, `_.isObject`, `_.isArguments`, `_.isFunction`,` _.isString`,
+`_.isNumber`, `_.isFinite`, `_.isBoolean`, `_.isDate`, `_.isRegExp`, `_.isNaN`,` _.isNull`,
+and `_.isUndefined`.
+I will use some or all of them over the course of this book.

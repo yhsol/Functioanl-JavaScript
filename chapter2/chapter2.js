@@ -102,10 +102,23 @@ function collectionCentricProgramming() {
   });
 }
 
+function reduceRightFn() {
+  let nums = [100, 2, 25];
+
+  function div(x, y) {
+    return x / y;
+  }
+
+  console.log(_.reduce(nums, div));
+
+  console.log(_.reduceRight(nums, div));
+}
+
+function findFn() {
+  console.log(_.find(["a", "b", 3, "d"], _.isNumber));
+}
+
 function run() {
-  // eachFn(["whiskey", "tango", "foxtrot"]);
-  // song2(99, 0, lyricsSegment);
-  // prototype();
-  console.log(collectionCentricProgramming());
+  reduceRightFn();
 }
 run();
